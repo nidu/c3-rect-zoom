@@ -1,0 +1,27 @@
+{
+  "name": "c3-rect-zoom",
+  "version": "0.0.1",
+  "description": "c3 plugin for rectangular zoom",
+  "main": "index.js",
+  "scripts": {
+    "start": "rollup -c",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nidu/c3-rect-zoom.git"
+  },
+  "keywords": [
+    "c3",
+    "chart"
+  ],
+  "author": "nidu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nidu/c3-rect-zoom/issues"
+  },
+  "homepage": "https://github.com/nidu/c3-rect-zoom#readme",
+  "dependencies": {
+    "c3": "^0.4.11"
+  }
+}
