@@ -4,7 +4,8 @@
   "description": "c3 plugin for rectangular zoom",
   "main": "index.js",
   "scripts": {
-    "start": "rollup -c",
+    "start": "tsc src/index.ts -w --outDir dist -m commonjs",
+    "build": "tsc src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

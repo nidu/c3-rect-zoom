@@ -1,0 +1,9 @@
+.c3-rect-zoom {
+    fill: #3498db;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.c3-rect-zoom.visible {
+    opacity: 0.2;
+}
