@@ -2,6 +2,8 @@ Plugin for [c3](https://github.com/c3js/c3) which allows zooming to rectangular 
 
 Currently only very simple use case is covered and i haven't tested it with different features (etc. regions).
 
+[Demo](http://jsfiddle.net/rg3w7gc5/3/)
+
 # Installation
 
 ```
