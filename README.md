@@ -8,6 +8,8 @@ Currently only very simple use case is covered and i haven't tested it with diff
 npm install c3-rect-zoom
 ```
 
+Also include css file `dist/index.css` somewhere.
+
 # Usage
 
 `c3-rect-zoom` adds (or wraps if needed) `oninit` and `onrendered` callback to props you provide to `c3.generate`.

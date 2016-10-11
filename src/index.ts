@@ -1,7 +1,5 @@
+/// <reference types="d3"/>
 /// <reference types="c3"/>
-import * as d3 from 'd3'
-declare var DEBUG
-
 interface c3RectZoomSettings {
 	/**
 	 * Padding from the margin for reset button.
@@ -29,207 +27,213 @@ interface c3RectZoomSettingsInternal {
 	minRectSize?: {width: number, height: number}
 }
 
-const resetBtnSize = {width: 24, height: 24}
+(function(window) {
+	const resetBtnSize = {width: 24, height: 24}
+	var d3 = window['d3'] || window['require']("d3")
 
-export function patchC3(c3): void {
-	const generate = c3.generate
-	c3.generate = function(chartProps) {
-		if (chartProps.c3RectZoom && chartProps.c3RectZoom.enabled) {
-			c3RectZoom(chartProps, chartProps.c3RectZoom)
-		}
-		generate(chartProps)
-	}
-}
-
-export function c3RectZoom(chartProps: c3.ChartConfiguration, optSettings: c3RectZoomSettings): c3.ChartConfiguration {
-	let svg
-	let chart
-	let dragStart
-	let initialRange
-	let settings: c3RectZoomSettingsInternal = {
-		resetBtnPadding: (typeof optSettings.resetBtnPadding == 'number' ? {x: optSettings.resetBtnPadding, y: optSettings.resetBtnPadding} : optSettings.resetBtnPadding) || {x: 20, y: 20},
-		resetBtnPos: optSettings.resetBtnPos || 'top-right',
-		minRectSize: (typeof optSettings.minRectSize == 'number' ? {width: optSettings.minRectSize, height: optSettings.minRectSize} : optSettings.minRectSize) || {width: 10, height: 10}
-	}
-
-	function mount(chartProps: c3.ChartConfiguration) {
-		const oninit = chartProps.oninit
-		chartProps.oninit = function() {
-			if (oninit) oninit()
-			chart = this
-			svg = this.svg
-			svg.selectAll('.c3-zoom-rect')
-				.on('mousedown', onMouseDown)
-				.on('mouseup', onMouseUp)
-				.on('mousemove', onMouseMove)
-		}
-
-		const onrendered = chartProps.onrendered
-		chartProps.onrendered = () => {
-			if (onrendered) onrendered()
-			console.log('onrendered', svg.selectAll('.c3-event-rect:first-child'))
-			const rect = svg.select('.c3-rect-zoom')
-
-			console.log('mountRectZoom')
-			svg.selectAll('.c3-event-rect')
-				.on('mousedown', onMouseDown)
-				.on('mouseup', onMouseUp)
-				.on('mousemove', onMouseMove)
-		}
-
-		return chartProps
-	}
-
-	function getResetBtn() {
-		const reset = svg.select('.c3-rect-zoom-reset')
-		if (reset.empty()) {
-			return svg.append('image')
-				.classed('c3-rect-zoom-reset', true)
-    			// https://www.iconfinder.com/icons/646193/maginifying_out_search_zoom_icon#size=24
-				.attr('xlink:href', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAADFUlEQVRIS62VS2gTURSG/3OTWGt9thafIAriRlB8oAhqnLaLKm5sJ8nKZmJpFetWBFGLK4ugglJFtBlFaJNBRavowiQjiN0oBXWhC3cipRZFk2qsmXtkhEhe06nSWc4583/nv+ecOwSHx7+vfbnHZ+1hyHUMUQtGFqD3QkgzMaA/A8BO3xa+p9KkxpbIKumxeiyIHYJ4kFi8YOCTAFczsAagZhDPJfDJREwfcIMUAXYFIi0S3Otl7rFq0GvqeraSgBLStsHCJRC9q0rXhB89uvjTCfQXYIsTrAuCafcTQ3/tVpmqqjPGqKaPmWrrkdlrGIZV6Zs/APtYfnl4yMfcOBXxvJCqqp4xmvNAMA8ljOhpR4ASaDOIaShh6OfcKi+N+9XwYkH8SuZ8G8w71z6UxsmeFvZaL2kWr3A6czeoEtDOAsgm49ETZYCGoNYpwZtTMb3dTchxpEORTcLKXUsaN9eXAZRgWy/Y8yoZ77vyvwC7F6M06xuNrpxnmt25oj3YFdQGwGSk4n23/zRc7ZgnaeKeG4yZTqWM6NN8nr+1bQS+qrVm/9WxYkBA0wXwJBGP3rIDGzs6fAu+5La4AXJe79tCsZ2t2lei6mWm0ZspAUROEHhGpQa5QfLxplBk6YTk4afx6KLyJofC21mK88l436apCpbmNaiRA1JwUyoWDZUBAJAS1N6BEE4ORJ//B4QUdf8wQRxLGPrjSgA0BMMhlnS0DpmthmFM/AtEUbUuJhlMxW9sd9xkO6AEIv0MaS3k8Tane6VUoDEQaZSSB6VHbDZj199MCmhuPlL1Y3bmLhERs9RMQx+ZxAkpqnYYjLMQmEngh7U8vq+S+6Lr2l6Yz5h9nEl2AeKGFBSrt9LDeUf2tEgLzYzcESZKM3kPedg6w6A9TpCyH45dtX0/Ca/VCbb2WkSrSSLNENUQyApCSkjW8w21nU/MSd+2IWD5oA7fWwqdVAQUHo3f3+3Fko/zkfNmS5conzcZxBUw1YkqhEjGYD0yrbaTaQPYhRQ5Ae7XcUadVkAphAgHpx2Qh2Tnpg+kYvrl3/9adJAnjeubAAAAAElFTkSuQmCC')
-				.attr('width', resetBtnSize.width)
-				.attr('height', resetBtnSize.height)
-				.on('click', resetZoom)
-		} else {
-			return reset
+	function patchC3(c3): void {
+		const generate = c3.generate
+		c3.generate = function(chartProps) {
+			if (chartProps.c3RectZoom && chartProps.c3RectZoom.enabled) {
+				install(chartProps, chartProps.c3RectZoom)
+			}
+			generate(chartProps)
 		}
 	}
 
-	function showResetBtn() {
-		console.log('showResetBtn', settings)
-		let x, y
-		const p = settings.resetBtnPadding
-		const w = chart.currentWidth
-		const h = chart.currentHeight
-		switch (settings.resetBtnPos) {
-			case 'top-left':
-			case 'bottom-left':
-				x = p.x
-				break
-			default:
-				x = w - p.x - resetBtnSize.width
-				break
+	function install(chartProps: c3.ChartConfiguration, optSettings: c3RectZoomSettings): c3.ChartConfiguration {
+		let svg
+		let chart
+		let dragStart
+		let initialRange
+		let settings: c3RectZoomSettingsInternal = {
+			resetBtnPadding: (typeof optSettings.resetBtnPadding == 'number' ? {x: optSettings.resetBtnPadding, y: optSettings.resetBtnPadding} : optSettings.resetBtnPadding) || {x: 20, y: 20},
+			resetBtnPos: optSettings.resetBtnPos || 'top-right',
+			minRectSize: (typeof optSettings.minRectSize == 'number' ? {width: optSettings.minRectSize, height: optSettings.minRectSize} : optSettings.minRectSize) || {width: 10, height: 10}
 		}
-		switch (settings.resetBtnPos) {
-			case 'top-left':
-			case 'top-right':
-				y = p.y
-				break
-			default:
-				y = h - p.y - resetBtnSize.height
-				break
+
+		function mount(chartProps: c3.ChartConfiguration) {
+			const oninit = chartProps.oninit
+			chartProps.oninit = function() {
+				if (oninit) oninit()
+				chart = this
+				svg = this.svg
+				svg.selectAll('.c3-zoom-rect')
+					.on('mousedown', onMouseDown)
+					.on('mouseup', onMouseUp)
+					.on('mousemove', onMouseMove)
+			}
+
+			const onrendered = chartProps.onrendered
+			chartProps.onrendered = () => {
+				if (onrendered) onrendered()
+				const rect = svg.select('.c3-rect-zoom')
+
+				svg.selectAll('.c3-event-rect')
+					.on('mousedown', onMouseDown)
+					.on('mouseup', onMouseUp)
+					.on('mousemove', onMouseMove)
+			}
+
+			return chartProps
 		}
-		getResetBtn()
-			.style('transform', `translate(${x}px,${y}px)`)
-			.classed('visible', true)
-	}
 
-	function getRect() { 
-		const rect = svg.select('.c3-rect-zoom')
-		if (rect.empty()) {
-			return svg.append('rect')
-				.classed('c3-rect-zoom', true)
-				.on('mouseup', onMouseUp)
-				.on('mousemove', onMouseMove)
-		} else {
-			return rect
-		}
-	}
-
-	function resetZoom() {
-		if (initialRange) {
-			DEBUG && console.log('Reset zoom to', initialRange)
-
-			chart.config.axis_x_min = initialRange.min.x
-			chart.config.axis_y_min = initialRange.min.y
-			chart.config.axis_y2_min = initialRange.min.y2
-
-			chart.config.axis_x_max = initialRange.max.x
-			chart.config.axis_y_max = initialRange.max.y
-			chart.config.axis_y2_max = initialRange.max.y2
-
-			chart.redraw({withUpdateOrgXDomain: true, withUpdateOrgYDomain: true})
-
-			getResetBtn().classed('visible', false)
-			initialRange = null
-		}
-	}
-
-	function zoomTo(p1, p2) {
-		showResetBtn()
-		if (!initialRange) {
-			initialRange = chart.api.axis.range()
-		}
-		const range = {
-			min: {
-				x: Math.min(p1.x, p2.x),
-				y: Math.min(p1.y, p2.y),
-				y2: Math.min(p1.y2, p2.y2),
-			},
-			max: {
-				x: Math.max(p1.x, p2.x),
-				y: Math.max(p1.y, p2.y),
-				y2: Math.max(p1.y2, p2.y2),
+		function getResetBtn() {
+			const reset = svg.select('.c3-rect-zoom-reset')
+			if (reset.empty()) {
+				return svg.append('image')
+					.classed('c3-rect-zoom-reset', true)
+					// https://www.iconfinder.com/icons/646193/maginifying_out_search_zoom_icon#size=24
+					.attr('xlink:href', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAADFUlEQVRIS62VS2gTURSG/3OTWGt9thafIAriRlB8oAhqnLaLKm5sJ8nKZmJpFetWBFGLK4ugglJFtBlFaJNBRavowiQjiN0oBXWhC3cipRZFk2qsmXtkhEhe06nSWc4583/nv+ecOwSHx7+vfbnHZ+1hyHUMUQtGFqD3QkgzMaA/A8BO3xa+p9KkxpbIKumxeiyIHYJ4kFi8YOCTAFczsAagZhDPJfDJREwfcIMUAXYFIi0S3Otl7rFq0GvqeraSgBLStsHCJRC9q0rXhB89uvjTCfQXYIsTrAuCafcTQ3/tVpmqqjPGqKaPmWrrkdlrGIZV6Zs/APtYfnl4yMfcOBXxvJCqqp4xmvNAMA8ljOhpR4ASaDOIaShh6OfcKi+N+9XwYkH8SuZ8G8w71z6UxsmeFvZaL2kWr3A6czeoEtDOAsgm49ETZYCGoNYpwZtTMb3dTchxpEORTcLKXUsaN9eXAZRgWy/Y8yoZ77vyvwC7F6M06xuNrpxnmt25oj3YFdQGwGSk4n23/zRc7ZgnaeKeG4yZTqWM6NN8nr+1bQS+qrVm/9WxYkBA0wXwJBGP3rIDGzs6fAu+5La4AXJe79tCsZ2t2lei6mWm0ZspAUROEHhGpQa5QfLxplBk6YTk4afx6KLyJofC21mK88l436apCpbmNaiRA1JwUyoWDZUBAJAS1N6BEE4ORJ//B4QUdf8wQRxLGPrjSgA0BMMhlnS0DpmthmFM/AtEUbUuJhlMxW9sd9xkO6AEIv0MaS3k8Tane6VUoDEQaZSSB6VHbDZj199MCmhuPlL1Y3bmLhERs9RMQx+ZxAkpqnYYjLMQmEngh7U8vq+S+6Lr2l6Yz5h9nEl2AeKGFBSrt9LDeUf2tEgLzYzcESZKM3kPedg6w6A9TpCyH45dtX0/Ca/VCbb2WkSrSSLNENUQyApCSkjW8w21nU/MSd+2IWD5oA7fWwqdVAQUHo3f3+3Fko/zkfNmS5conzcZxBUw1YkqhEjGYD0yrbaTaQPYhRQ5Ae7XcUadVkAphAgHpx2Qh2Tnpg+kYvrl3/9adJAnjeubAAAAAElFTkSuQmCC')
+					.attr('width', resetBtnSize.width)
+					.attr('height', resetBtnSize.height)
+					.on('click', resetZoom)
+			} else {
+				return reset
 			}
 		}
-		DEBUG && console.log('Zoom to', range)
-		chart.api.axis.range(range)
-	}
 
-	function onMouseDown() {
-		dragStart = eventToPoint(d3.event)
-		getRect().classed('visible', true)
-	}
-
-	function onMouseMove() {
-		if (!dragStart) return
-
-		const p1 = dragStart
-		const p2 = eventToPoint(d3.event)
-		getRect()
-			.attr('x', Math.min(p1.x, p2.x))
-			.attr('y', Math.min(p1.y, p2.y))
-			.attr('width', Math.abs(p2.x - p1.x))
-			.attr('height', Math.abs(p2.y - p1.y))
-	}
-
-	function onMouseUp() {
-		if (!dragStart) return
-
-		const p1 = screenPointToDomain(dragStart)
-		const dragEnd = eventToPoint(d3.event)
-		const p2 = screenPointToDomain(dragEnd)
-		console.log('onMouseUp', p1, p2)
-		getRect()
-			.classed('visible', false)
-			.attr('width', 0)
-			.attr('height', 0)
-		if (shouldZoom(dragStart, dragEnd)) {
-			zoomTo(p1, p2)
+		function showResetBtn() {
+			let x, y
+			const p = settings.resetBtnPadding
+			const w = chart.currentWidth
+			const h = chart.currentHeight
+			switch (settings.resetBtnPos) {
+				case 'top-left':
+				case 'bottom-left':
+					x = p.x
+					break
+				default:
+					x = w - p.x - resetBtnSize.width
+					break
+			}
+			switch (settings.resetBtnPos) {
+				case 'top-left':
+				case 'top-right':
+					y = p.y
+					break
+				default:
+					y = h - p.y - resetBtnSize.height
+					break
+			}
+			getResetBtn()
+				.style('transform', `translate(${x}px,${y}px)`)
+				.classed('visible', true)
 		}
-		dragStart = null
-	}
 
-	function shouldZoom(p1, p2) {
-		const width = Math.abs(p2.x - p1.x)
-		const height = Math.abs(p2.y - p1.y)
-		return width >= settings.minRectSize.width && height >= settings.minRectSize.height
-	}
-
-	function screenPointToDomain(p) {
-		return {
-			x: d3.scale.linear().domain(chart.getXDomain(chart.data.targets)).invert(p.x / chart.currentWidth),
-			y: d3.scale.linear().domain(chart.getYDomain(chart.data.targets)).invert((chart.currentHeight - p.y) / chart.currentHeight),
-			y2: d3.scale.linear().domain(chart.getYDomain(chart.data.targets, 'y2')).invert((chart.currentHeight - p.y) / chart.currentHeight)
+		function getRect() { 
+			const rect = svg.select('.c3-rect-zoom')
+			if (rect.empty()) {
+				return svg.append('rect')
+					.classed('c3-rect-zoom', true)
+					.on('mouseup', onMouseUp)
+					.on('mousemove', onMouseMove)
+			} else {
+				return rect
+			}
 		}
-	}
 
-	function eventToPoint(e) {
-		return {
-			x: e.layerX,
-			y: e.layerY
+		function resetZoom() {
+			if (initialRange) {
+				chart.config.axis_x_min = initialRange.min.x
+				chart.config.axis_y_min = initialRange.min.y
+				chart.config.axis_y2_min = initialRange.min.y2
+
+				chart.config.axis_x_max = initialRange.max.x
+				chart.config.axis_y_max = initialRange.max.y
+				chart.config.axis_y2_max = initialRange.max.y2
+
+				chart.redraw({withUpdateOrgXDomain: true, withUpdateOrgYDomain: true})
+
+				getResetBtn().classed('visible', false)
+				initialRange = null
+			}
 		}
+
+		function zoomTo(p1, p2) {
+			showResetBtn()
+			if (!initialRange) {
+				initialRange = chart.api.axis.range()
+			}
+			const range = {
+				min: {
+					x: Math.min(p1.x, p2.x),
+					y: Math.min(p1.y, p2.y),
+					y2: Math.min(p1.y2, p2.y2),
+				},
+				max: {
+					x: Math.max(p1.x, p2.x),
+					y: Math.max(p1.y, p2.y),
+					y2: Math.max(p1.y2, p2.y2),
+				}
+			}
+			chart.api.axis.range(range)
+		}
+
+		function onMouseDown() {
+			dragStart = eventToPoint(d3.event)
+			getRect().classed('visible', true)
+		}
+
+		function onMouseMove() {
+			if (!dragStart) return
+
+			const p1 = dragStart
+			const p2 = eventToPoint(d3.event)
+			getRect()
+				.attr('x', Math.min(p1.x, p2.x))
+				.attr('y', Math.min(p1.y, p2.y))
+				.attr('width', Math.abs(p2.x - p1.x))
+				.attr('height', Math.abs(p2.y - p1.y))
+		}
+
+		function onMouseUp() {
+			if (!dragStart) return
+
+			const p1 = screenPointToDomain(dragStart)
+			const dragEnd = eventToPoint(d3.event)
+			const p2 = screenPointToDomain(dragEnd)
+			getRect()
+				.classed('visible', false)
+				.attr('width', 0)
+				.attr('height', 0)
+			if (shouldZoom(dragStart, dragEnd)) {
+				zoomTo(p1, p2)
+			}
+			dragStart = null
+		}
+
+		function shouldZoom(p1, p2) {
+			const width = Math.abs(p2.x - p1.x)
+			const height = Math.abs(p2.y - p1.y)
+			return width >= settings.minRectSize.width && height >= settings.minRectSize.height
+		}
+
+		function screenPointToDomain(p) {
+			return {
+				x: d3.scale.linear().domain(chart.getXDomain(chart.data.targets)).invert(p.x / chart.currentWidth),
+				y: d3.scale.linear().domain(chart.getYDomain(chart.data.targets)).invert((chart.currentHeight - p.y) / chart.currentHeight),
+				y2: d3.scale.linear().domain(chart.getYDomain(chart.data.targets, 'y2')).invert((chart.currentHeight - p.y) / chart.currentHeight)
+			}
+		}
+
+		function eventToPoint(e) {
+			return {
+				x: e.layerX,
+				y: e.layerY
+			}
+		}
+
+		return mount(chartProps)
 	}
 
-	return mount(chartProps)
-}
+	const c3RectZoom = {patchC3, install}
+
+	if (typeof define === 'function' && define.amd) {
+        define('c3RectZoom', ['d3', 'c3'], function () { return c3RectZoom })
+    } else if ('undefined' !== typeof exports && 'undefined' !== typeof module) {
+        module.exports = c3RectZoom
+    } else {
+        window['c3RectZoom'] = c3RectZoom
+    }
+}(window))

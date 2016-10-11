@@ -1,0 +1,20 @@
+.c3-rect-zoom, .c3-rect-zoom-reset {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.c3-rect-zoom {
+    fill: #3498db;
+}
+
+.c3-rect-zoom-reset {
+    cursor: pointer;
+}
+
+.c3-rect-zoom.visible {
+    opacity: 0.2;
+}
+
+.c3-rect-zoom-reset.visible {
+    opacity: 0.7;
+}
