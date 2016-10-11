@@ -1,11 +1,11 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
+        "module": "none",
         "target": "es5",
         "noImplicitAny": false,
         "outDir": "dist"
     },
     "files": [
-        "src/index.ts"
+        "src/c3-rect-zoom.ts"
     ]
 }

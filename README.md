@@ -8,24 +8,13 @@ Currently only very simple use case is covered and i haven't tested it with diff
 npm install c3-rect-zoom
 ```
 
-Also include css file `dist/index.css` somewhere.
+Or just download `dist/c3-rect-zoom.js` and add it with script tag.
+
+Also include css file `dist/c3-rect-zoom.css` somewhere.
 
 # Usage
 
 `c3-rect-zoom` adds (or wraps if needed) `oninit` and `onrendered` callback to props you provide to `c3.generate`.
-
-Pass chart props to c3RectZoom
-
-```js
-var c3 = require('c3')
-var {c3RectZoom} = require('c3-rect-zoom')
-
-c3.generate(c3RectZoom({
-    data: ...
-}, c3RectZoomSettings))
-```
-
-Or patch c3 to use as an option
 
 ```js
 // Once somewhere in the beginning...
@@ -36,14 +25,15 @@ require('c3-rect-zoom').patchC3(c3)
 c3.generate({
     data: ...,
     c3RectZoom: {
-        enabled: true
+        enabled: true,
+        ...c3RectZoomSettings
     }
 })
 ```
 
 # Settings
 
-See interface `c3RectZoomSettings` in [index.ts](https://github.com/nidu/c3-rect-zoom/blob/master/src/index.ts).
+See interface `c3RectZoomSettings` in [c3-rect-zoom.ts](https://github.com/nidu/c3-rect-zoom/blob/master/src/c3-rect-zoom.ts).
 
 # License
 
