@@ -27,9 +27,9 @@
                     oninit();
                 chart = this;
                 svg = this.svg;
+                svg.on('mouseup.c3RectZoom', onMouseUp);
                 svg.selectAll('.c3-zoom-rect')
                     .on('mousedown.c3RectZoom', onMouseDown)
-                    .on('mouseup.c3RectZoom', onMouseUp)
                     .on('mousemove.c3RectZoom', onMouseMove);
             };
             var onrendered = chartProps.onrendered;
@@ -39,8 +39,13 @@
                 var rect = svg.select('.c3-rect-zoom');
                 svg.selectAll('.c3-event-rect')
                     .on('mousedown.c3RectZoom', onMouseDown)
-                    .on('mouseup.c3RectZoom', onMouseUp)
                     .on('mousemove.c3RectZoom', onMouseMove);
+            };
+            var onmouseout = chartProps.onmouseout;
+            chartProps.onmouseout = function () {
+                if (onmouseout)
+                    onmouseout();
+                onMouseUp();
             };
             return chartProps;
         }
@@ -90,7 +95,6 @@
             if (rect.empty()) {
                 return svg.append('rect')
                     .classed('c3-rect-zoom', true)
-                    .on('mouseup.c3RectZoom', onMouseUp)
                     .on('mousemove.c3RectZoom', onMouseMove);
             }
             else {

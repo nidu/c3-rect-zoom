@@ -7,3 +7,8 @@
 - Selected area matches selection rectangle more closely
 - Added namespace to events so tooltip works now
 - Works with paddings (not with axis paddings)
+
+# 0.0.6
+
+- Added onmouseout event
+- mouseout works on entire svg

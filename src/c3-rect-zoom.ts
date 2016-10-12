@@ -58,9 +58,9 @@ interface c3RectZoomSettingsInternal {
 				if (oninit) oninit()
 				chart = this
 				svg = this.svg
+				svg.on('mouseup.c3RectZoom', onMouseUp)
 				svg.selectAll('.c3-zoom-rect')
 					.on('mousedown.c3RectZoom', onMouseDown)
-					.on('mouseup.c3RectZoom', onMouseUp)
 					.on('mousemove.c3RectZoom', onMouseMove)
 			}
 
@@ -71,8 +71,13 @@ interface c3RectZoomSettingsInternal {
 
 				svg.selectAll('.c3-event-rect')
 					.on('mousedown.c3RectZoom', onMouseDown)
-					.on('mouseup.c3RectZoom', onMouseUp)
 					.on('mousemove.c3RectZoom', onMouseMove)
+			}
+
+			const onmouseout = chartProps.onmouseout
+			chartProps.onmouseout = () => {
+				if (onmouseout) onmouseout()
+				onMouseUp()
 			}
 
 			return chartProps
@@ -126,7 +131,6 @@ interface c3RectZoomSettingsInternal {
 			if (rect.empty()) {
 				return svg.append('rect')
 					.classed('c3-rect-zoom', true)
-					.on('mouseup.c3RectZoom', onMouseUp)
 					.on('mousemove.c3RectZoom', onMouseMove)
 			} else {
 				return rect
