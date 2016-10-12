@@ -37,7 +37,7 @@ interface c3RectZoomSettingsInternal {
 			if (chartProps.c3RectZoom && chartProps.c3RectZoom.enabled) {
 				install(chartProps, chartProps.c3RectZoom)
 			}
-			generate(chartProps)
+			return generate(chartProps)
 		}
 	}
 
