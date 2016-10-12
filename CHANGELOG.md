@@ -12,3 +12,4 @@
 
 - Added onmouseout event
 - mouseout works on entire svg
+- Fixed incorrect point conversion when in transformed container

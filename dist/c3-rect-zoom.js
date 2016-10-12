@@ -135,6 +135,7 @@
         }
         function onMouseDown() {
             dragStart = eventToPoint(d3.event);
+            console.log(d3.event);
             getRect().classed('visible', true);
         }
         function onMouseMove() {
@@ -183,8 +184,8 @@
         }
         function eventToPoint(e) {
             return {
-                x: e.layerX,
-                y: e.layerY
+                x: e.offsetX,
+                y: e.offsetY
             };
         }
         return mount(chartProps);
