@@ -1,3 +1,9 @@
 # 0.0.4
 
 - `c3.generate` wrapper now returns value
+
+# 0.0.5
+
+- Selected area matches selection rectangle more closely
+- Added namespace to events so tooltip works now
+- Works with paddings (not with axis paddings)

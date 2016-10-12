@@ -59,9 +59,9 @@ interface c3RectZoomSettingsInternal {
 				chart = this
 				svg = this.svg
 				svg.selectAll('.c3-zoom-rect')
-					.on('mousedown', onMouseDown)
-					.on('mouseup', onMouseUp)
-					.on('mousemove', onMouseMove)
+					.on('mousedown.c3RectZoom', onMouseDown)
+					.on('mouseup.c3RectZoom', onMouseUp)
+					.on('mousemove.c3RectZoom', onMouseMove)
 			}
 
 			const onrendered = chartProps.onrendered
@@ -70,9 +70,9 @@ interface c3RectZoomSettingsInternal {
 				const rect = svg.select('.c3-rect-zoom')
 
 				svg.selectAll('.c3-event-rect')
-					.on('mousedown', onMouseDown)
-					.on('mouseup', onMouseUp)
-					.on('mousemove', onMouseMove)
+					.on('mousedown.c3RectZoom', onMouseDown)
+					.on('mouseup.c3RectZoom', onMouseUp)
+					.on('mousemove.c3RectZoom', onMouseMove)
 			}
 
 			return chartProps
@@ -87,7 +87,7 @@ interface c3RectZoomSettingsInternal {
 					.attr('xlink:href', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAADFUlEQVRIS62VS2gTURSG/3OTWGt9thafIAriRlB8oAhqnLaLKm5sJ8nKZmJpFetWBFGLK4ugglJFtBlFaJNBRavowiQjiN0oBXWhC3cipRZFk2qsmXtkhEhe06nSWc4583/nv+ecOwSHx7+vfbnHZ+1hyHUMUQtGFqD3QkgzMaA/A8BO3xa+p9KkxpbIKumxeiyIHYJ4kFi8YOCTAFczsAagZhDPJfDJREwfcIMUAXYFIi0S3Otl7rFq0GvqeraSgBLStsHCJRC9q0rXhB89uvjTCfQXYIsTrAuCafcTQ3/tVpmqqjPGqKaPmWrrkdlrGIZV6Zs/APtYfnl4yMfcOBXxvJCqqp4xmvNAMA8ljOhpR4ASaDOIaShh6OfcKi+N+9XwYkH8SuZ8G8w71z6UxsmeFvZaL2kWr3A6czeoEtDOAsgm49ETZYCGoNYpwZtTMb3dTchxpEORTcLKXUsaN9eXAZRgWy/Y8yoZ77vyvwC7F6M06xuNrpxnmt25oj3YFdQGwGSk4n23/zRc7ZgnaeKeG4yZTqWM6NN8nr+1bQS+qrVm/9WxYkBA0wXwJBGP3rIDGzs6fAu+5La4AXJe79tCsZ2t2lei6mWm0ZspAUROEHhGpQa5QfLxplBk6YTk4afx6KLyJofC21mK88l436apCpbmNaiRA1JwUyoWDZUBAJAS1N6BEE4ORJ//B4QUdf8wQRxLGPrjSgA0BMMhlnS0DpmthmFM/AtEUbUuJhlMxW9sd9xkO6AEIv0MaS3k8Tane6VUoDEQaZSSB6VHbDZj199MCmhuPlL1Y3bmLhERs9RMQx+ZxAkpqnYYjLMQmEngh7U8vq+S+6Lr2l6Yz5h9nEl2AeKGFBSrt9LDeUf2tEgLzYzcESZKM3kPedg6w6A9TpCyH45dtX0/Ca/VCbb2WkSrSSLNENUQyApCSkjW8w21nU/MSd+2IWD5oA7fWwqdVAQUHo3f3+3Fko/zkfNmS5conzcZxBUw1YkqhEjGYD0yrbaTaQPYhRQ5Ae7XcUadVkAphAgHpx2Qh2Tnpg+kYvrl3/9adJAnjeubAAAAAElFTkSuQmCC')
 					.attr('width', resetBtnSize.width)
 					.attr('height', resetBtnSize.height)
-					.on('click', resetZoom)
+					.on('click.c3RectZoom', resetZoom)
 			} else {
 				return reset
 			}
@@ -126,8 +126,8 @@ interface c3RectZoomSettingsInternal {
 			if (rect.empty()) {
 				return svg.append('rect')
 					.classed('c3-rect-zoom', true)
-					.on('mouseup', onMouseUp)
-					.on('mousemove', onMouseMove)
+					.on('mouseup.c3RectZoom', onMouseUp)
+					.on('mousemove.c3RectZoom', onMouseMove)
 			} else {
 				return rect
 			}
@@ -210,10 +210,17 @@ interface c3RectZoomSettingsInternal {
 		}
 
 		function screenPointToDomain(p) {
+			const svgBox = svg.node().getBoundingClientRect()
+			const c3ChartBox = svg.select('.c3-chart').node().getBoundingClientRect()
+			const x = c3ChartBox.left - svgBox.left
+			const y = c3ChartBox.top - svgBox.top
+			const w = c3ChartBox.width
+			const h = c3ChartBox.height
+
 			return {
-				x: d3.scale.linear().domain(chart.getXDomain(chart.data.targets)).invert(p.x / chart.currentWidth),
-				y: d3.scale.linear().domain(chart.getYDomain(chart.data.targets)).invert((chart.currentHeight - p.y) / chart.currentHeight),
-				y2: d3.scale.linear().domain(chart.getYDomain(chart.data.targets, 'y2')).invert((chart.currentHeight - p.y) / chart.currentHeight)
+				x: d3.scale.linear().domain(chart.getXDomain(chart.data.targets)).invert((p.x - x) / w),
+				y: d3.scale.linear().domain(chart.getYDomain(chart.data.targets)).invert((h - p.y + y) / h),
+				y2: d3.scale.linear().domain(chart.getYDomain(chart.data.targets, 'y2')).invert((h - p.y + y) / h)
 			}
 		}
 
