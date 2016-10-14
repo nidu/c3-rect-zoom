@@ -1,3 +1,6 @@
+/// <reference types="d3"/>
+/// <reference types="c3"/>
+/// <reference path="./../dist/c3-rect-zoom.d.ts"/>
 (function (window) {
     var resetBtnSize = { width: 24, height: 24 };
     var d3 = window['d3'] || window['require']("d3");
@@ -27,10 +30,11 @@
                     oninit();
                 chart = this;
                 svg = this.svg;
-                svg.on('mouseup.c3RectZoom', onMouseUp);
-                svg.selectAll('.c3-zoom-rect')
-                    .on('mousedown.c3RectZoom', onMouseDown)
+                svg
+                    .on('mouseup.c3RectZoom', onMouseUp)
                     .on('mousemove.c3RectZoom', onMouseMove);
+                svg.selectAll('.c3-zoom-rect')
+                    .on('mousedown.c3RectZoom', onMouseDown);
             };
             var onrendered = chartProps.onrendered;
             chartProps.onrendered = function () {
@@ -38,8 +42,7 @@
                     onrendered();
                 var rect = svg.select('.c3-rect-zoom');
                 svg.selectAll('.c3-event-rect')
-                    .on('mousedown.c3RectZoom', onMouseDown)
-                    .on('mousemove.c3RectZoom', onMouseMove);
+                    .on('mousedown.c3RectZoom', onMouseDown);
             };
             var onmouseout = chartProps.onmouseout;
             chartProps.onmouseout = function () {
@@ -94,8 +97,7 @@
             var rect = svg.select('.c3-rect-zoom');
             if (rect.empty()) {
                 return svg.append('rect')
-                    .classed('c3-rect-zoom', true)
-                    .on('mousemove.c3RectZoom', onMouseMove);
+                    .classed('c3-rect-zoom', true);
             }
             else {
                 return rect;
@@ -170,23 +172,34 @@
             return width >= settings.minRectSize.width && height >= settings.minRectSize.height;
         }
         function screenPointToDomain(p) {
+            var b = workingAreaBounds();
+            return {
+                x: d3.scale.linear().domain(chart.getXDomain(chart.data.targets)).invert((p.x - b.x) / b.w),
+                y: d3.scale.linear().domain(chart.getYDomain(chart.data.targets)).invert((b.h - p.y + b.y) / b.h),
+                y2: d3.scale.linear().domain(chart.getYDomain(chart.data.targets, 'y2')).invert((b.h - p.y + b.y) / b.h)
+            };
+        }
+        function eventToPoint(e) {
+            return trimPoint({
+                x: e.offsetX,
+                y: e.offsetY
+            });
+        }
+        function trimPoint(p) {
+            var b = workingAreaBounds();
+            return {
+                x: Math.max(b.x, Math.min(b.x + b.w, p.x)),
+                y: Math.max(b.y, Math.min(b.y + b.h, p.y))
+            };
+        }
+        function workingAreaBounds() {
             var svgBox = svg.node().getBoundingClientRect();
             var c3ChartBox = svg.select('.c3-chart').node().getBoundingClientRect();
             var x = c3ChartBox.left - svgBox.left;
             var y = c3ChartBox.top - svgBox.top;
             var w = c3ChartBox.width;
             var h = c3ChartBox.height;
-            return {
-                x: d3.scale.linear().domain(chart.getXDomain(chart.data.targets)).invert((p.x - x) / w),
-                y: d3.scale.linear().domain(chart.getYDomain(chart.data.targets)).invert((h - p.y + y) / h),
-                y2: d3.scale.linear().domain(chart.getYDomain(chart.data.targets, 'y2')).invert((h - p.y + y) / h)
-            };
-        }
-        function eventToPoint(e) {
-            return {
-                x: e.offsetX,
-                y: e.offsetY
-            };
+            return { x: x, y: y, w: w, h: h };
         }
         return mount(chartProps);
     }
@@ -201,4 +214,3 @@
         window['c3RectZoom'] = c3RectZoom;
     }
 }(window));
-//# sourceMappingURL=c3-rect-zoom.js.map

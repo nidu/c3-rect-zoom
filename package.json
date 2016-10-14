@@ -1,8 +1,9 @@
 {
   "name": "c3-rect-zoom",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "c3 plugin for rectangular zoom",
   "main": "dist/c3-rect-zoom.js",
+  "types": "dist/c3-rect-zoom.d.ts",
   "scripts": {
     "start": "tsc -w --sourceMap",
     "test": "echo \"Error: no test specified\" && exit 1"

@@ -13,3 +13,8 @@
 - Added onmouseout event
 - mouseout works on entire svg
 - Fixed incorrect point conversion when in transformed container
+
+# 0.0.7
+
+- Added typescript types
+- Better mouse move response

@@ -28,14 +28,14 @@ c3.generate({
     data: ...,
     c3RectZoom: {
         enabled: true,
-        ...c3RectZoomSettings
+        // ...c3RectZoom.Settings
     }
 })
 ```
 
 # Settings
 
-See interface `c3RectZoomSettings` in [c3-rect-zoom.ts](https://github.com/nidu/c3-rect-zoom/blob/master/src/c3-rect-zoom.ts).
+See interface `c3RectZoom.Settings` in [c3-rect-zoom.d.ts](https://github.com/nidu/c3-rect-zoom/blob/master/dist/c3-rect-zoom.d.ts).
 
 # License
 

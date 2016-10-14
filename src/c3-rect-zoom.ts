@@ -1,33 +1,14 @@
 /// <reference types="d3"/>
 /// <reference types="c3"/>
-interface c3RectZoomSettings {
-	/**
-	 * Padding from the margin for reset button.
-	 * If number is given - used both as x and y padding.
-	 * @default {x: 20, y: 20}
-	 */
-	resetBtnPadding?: {x: number, y: number} | number,
-	/**
-	 * Reset button position on the chart.
-	 * @default 'top-right'
-	 */
-	resetBtnPos?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right',
-	/**
-	 * Minimum selection area dimensions.
-	 * If at least one dimensions doesn't exceed this setting - zoom doesn't happen.
-	 * Specified in pixels.
-	 * @default {width: 10, height: 10}  
-	 */
-	minRectSize?: {width: number, height: number} | number
-}
-
-interface c3RectZoomSettingsInternal { 
-	resetBtnPadding?: {x: number, y: number},
-	resetBtnPos?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right',
-	minRectSize?: {width: number, height: number}
-}
+/// <reference path="./../dist/c3-rect-zoom.d.ts"/>
 
 (function(window) {
+	interface c3RectZoomSettingsInternal { 
+		resetBtnPadding?: {x: number, y: number},
+		resetBtnPos?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right',
+		minRectSize?: {width: number, height: number}
+	}
+
 	const resetBtnSize = {width: 24, height: 24}
 	var d3 = window['d3'] || window['require']("d3")
 
@@ -41,7 +22,7 @@ interface c3RectZoomSettingsInternal {
 		}
 	}
 
-	function install(chartProps: c3.ChartConfiguration, optSettings: c3RectZoomSettings): c3.ChartConfiguration {
+	function install(chartProps: c3.ChartConfiguration, optSettings: c3RectZoom.Settings): c3.ChartConfiguration {
 		let svg
 		let chart
 		let dragStart
@@ -58,10 +39,11 @@ interface c3RectZoomSettingsInternal {
 				if (oninit) oninit()
 				chart = this
 				svg = this.svg
-				svg.on('mouseup.c3RectZoom', onMouseUp)
+				svg
+					.on('mouseup.c3RectZoom', onMouseUp)
+					.on('mousemove.c3RectZoom', onMouseMove)
 				svg.selectAll('.c3-zoom-rect')
 					.on('mousedown.c3RectZoom', onMouseDown)
-					.on('mousemove.c3RectZoom', onMouseMove)
 			}
 
 			const onrendered = chartProps.onrendered
@@ -71,7 +53,6 @@ interface c3RectZoomSettingsInternal {
 
 				svg.selectAll('.c3-event-rect')
 					.on('mousedown.c3RectZoom', onMouseDown)
-					.on('mousemove.c3RectZoom', onMouseMove)
 			}
 
 			const onmouseout = chartProps.onmouseout
@@ -131,7 +112,6 @@ interface c3RectZoomSettingsInternal {
 			if (rect.empty()) {
 				return svg.append('rect')
 					.classed('c3-rect-zoom', true)
-					.on('mousemove.c3RectZoom', onMouseMove)
 			} else {
 				return rect
 			}
@@ -215,25 +195,39 @@ interface c3RectZoomSettingsInternal {
 		}
 
 		function screenPointToDomain(p) {
+			const b = workingAreaBounds()
+
+			return {
+				x: d3.scale.linear().domain(chart.getXDomain(chart.data.targets)).invert((p.x - b.x) / b.w),
+				y: d3.scale.linear().domain(chart.getYDomain(chart.data.targets)).invert((b.h - p.y + b.y) / b.h),
+				y2: d3.scale.linear().domain(chart.getYDomain(chart.data.targets, 'y2')).invert((b.h - p.y + b.y) / b.h)
+			}
+		}
+
+		function eventToPoint(e) {
+			return trimPoint({
+				x: e.offsetX,
+				y: e.offsetY
+			})
+		}
+
+		function trimPoint(p) {
+			const b = workingAreaBounds()
+
+			return {
+				x: Math.max(b.x, Math.min(b.x + b.w, p.x)),
+				y: Math.max(b.y, Math.min(b.y + b.h, p.y))
+			}
+		}
+
+		function workingAreaBounds() {
 			const svgBox = svg.node().getBoundingClientRect()
 			const c3ChartBox = svg.select('.c3-chart').node().getBoundingClientRect()
 			const x = c3ChartBox.left - svgBox.left
 			const y = c3ChartBox.top - svgBox.top
 			const w = c3ChartBox.width
 			const h = c3ChartBox.height
-
-			return {
-				x: d3.scale.linear().domain(chart.getXDomain(chart.data.targets)).invert((p.x - x) / w),
-				y: d3.scale.linear().domain(chart.getYDomain(chart.data.targets)).invert((h - p.y + y) / h),
-				y2: d3.scale.linear().domain(chart.getYDomain(chart.data.targets, 'y2')).invert((h - p.y + y) / h)
-			}
-		}
-
-		function eventToPoint(e) {
-			return {
-				x: e.offsetX,
-				y: e.offsetY
-			}
+			return {x, y, w, h}
 		}
 
 		return mount(chartProps)
