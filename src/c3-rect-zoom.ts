@@ -222,7 +222,7 @@
 
 		function workingAreaBounds() {
 			const svgBox = svg.node().getBoundingClientRect()
-			const c3ChartBox = svg.select('.c3-chart').node().getBoundingClientRect()
+			const c3ChartBox = svg.select('.c3-event-rects').node().getBoundingClientRect()
 			const x = c3ChartBox.left - svgBox.left
 			const y = c3ChartBox.top - svgBox.top
 			const w = c3ChartBox.width

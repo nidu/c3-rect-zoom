@@ -13,6 +13,14 @@
 <div id="chart2"></div>
 <div id="chart3" style="transform:translate(0px,-100px)"></div>
 <script type="text/javascript">
+	function range(from, to) {
+		var a = []
+		for (var i = from; i < to; i++) {
+			a.push(i)
+		}
+		return a
+	}
+
 	function generateNums(n, range) {
 		var a = []
 		range = range || 100
@@ -40,13 +48,28 @@
 			}
 		})
 
-		c3.generate({
+		var chart2 = c3.generate({
 			bindto: document.querySelector('#chart2'),
 			data: {
 				columns: [
-					['d1'].concat(generateNums(50)),
-					['d2'].concat(generateNums(50))
+					['d1'].concat(generateNums(25)),
+					['x1'].concat(range(0, 26)),
+					['d2'].concat(generateNums(25)),
+					['x2'].concat(range(25, 50))
 				],
+				xs: {
+					d1: 'x1',
+					d2: 'x2'
+				},
+				names: {
+					d1: 'First data series',
+					d2: 'Second data series (which is not first data series)'
+				}
+			},
+			axis: {
+				y: {
+					max: 500
+				}
 			},
 			regions: [
 				{axis: 'x', start: 1, end: 10},
@@ -56,8 +79,19 @@
 				enabled: true,
 				resetBtnPadding: {x: 50, y: 20},
 				resetBtnPos: 'top-left'
-			}
+			},
+			size: {width: 300}
 		})
+		setTimeout(function() {
+			chart2.load({
+				columns: [
+					['d1'].concat(generateNums(25, 1000)),
+					['x1'].concat(range(0, 26)),
+					['d2'].concat(generateNums(25)),
+					['x2'].concat(range(25, 50))
+				]
+			})
+		}, 1000)
 
 		c3.generate({
 			bindto: document.querySelector('#chart3'),

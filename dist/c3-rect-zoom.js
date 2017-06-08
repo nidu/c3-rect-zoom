@@ -194,7 +194,7 @@
         }
         function workingAreaBounds() {
             var svgBox = svg.node().getBoundingClientRect();
-            var c3ChartBox = svg.select('.c3-chart').node().getBoundingClientRect();
+            var c3ChartBox = svg.select('.c3-event-rects').node().getBoundingClientRect();
             var x = c3ChartBox.left - svgBox.left;
             var y = c3ChartBox.top - svgBox.top;
             var w = c3ChartBox.width;
