@@ -206,8 +206,8 @@
 
 		function eventToPoint(e) {
 			return trimPoint({
-				x: e.offsetX,
-				y: e.offsetY
+				x: e.layerX,
+				y: e.layerY
 			})
 		}
 
