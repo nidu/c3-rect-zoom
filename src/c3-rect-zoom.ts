@@ -156,7 +156,6 @@
 
 		function onMouseDown() {
 			dragStart = eventToPoint(d3.event)
-			console.log(d3.event)
 			getRect().classed('visible', true)
 		}
 
