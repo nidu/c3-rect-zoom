@@ -18,3 +18,15 @@
 
 - Added typescript types
 - Better mouse move response
+
+# 0.0.8
+
+- Fix incorrect zoom when max is set
+
+# 0.0.9
+
+- Better IE support
+
+# 0.0.10
+
+- Remove forgotten console.log (thanks @noliiva)
