@@ -29,4 +29,8 @@
 
 # 0.0.10
 
+Unpublished
+
+# 0.0.11
+
 - Remove forgotten console.log (thanks @noliiva)

@@ -137,7 +137,6 @@
         }
         function onMouseDown() {
             dragStart = eventToPoint(d3.event);
-            console.log(d3.event);
             getRect().classed('visible', true);
         }
         function onMouseMove() {
@@ -214,3 +213,4 @@
         window['c3RectZoom'] = c3RectZoom;
     }
 }(window));
+//# sourceMappingURL=c3-rect-zoom.js.map
