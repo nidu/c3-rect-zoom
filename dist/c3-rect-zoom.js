@@ -173,9 +173,9 @@
         function screenPointToDomain(p) {
             var b = workingAreaBounds();
             return {
-                x: d3.scale.linear().domain(chart.getXDomain(chart.data.targets)).invert((p.x - b.x) / b.w),
-                y: d3.scale.linear().domain(chart.getYDomain(chart.data.targets)).invert((b.h - p.y + b.y) / b.h),
-                y2: d3.scale.linear().domain(chart.getYDomain(chart.data.targets, 'y2')).invert((b.h - p.y + b.y) / b.h)
+                x: d3.scaleLinear().domain(chart.getXDomain(chart.data.targets)).invert((p.x - b.x) / b.w),
+                y: d3.scaleLinear().domain(chart.getYDomain(chart.data.targets)).invert((b.h - p.y + b.y) / b.h),
+                y2: d3.scaleLinear().domain(chart.getYDomain(chart.data.targets, 'y2')).invert((b.h - p.y + b.y) / b.h)
             };
         }
         function eventToPoint(e) {
