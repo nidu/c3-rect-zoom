@@ -34,3 +34,10 @@ Unpublished
 # 0.0.11
 
 - Remove forgotten console.log (thanks @noliiva)
+
+# 0.0.12
+
+- Better precision for consequtive zoom
+- Better crossbrowser support: tested in Chrome v65, Firefox v57 and IE v11
+- Fix reset button position in IE
+- Fix offset when chart is in translated element

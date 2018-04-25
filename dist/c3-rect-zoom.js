@@ -23,6 +23,8 @@
             resetBtnPos: optSettings.resetBtnPos || 'top-right',
             minRectSize: (typeof optSettings.minRectSize == 'number' ? { width: optSettings.minRectSize, height: optSettings.minRectSize } : optSettings.minRectSize) || { width: 10, height: 10 }
         };
+        var isIE = window.navigator.userAgent.indexOf('Trident') != -1;
+        var isFirefox = window.navigator.userAgent.indexOf('Firefox') != -1;
         function mount(chartProps) {
             var oninit = chartProps.oninit;
             chartProps.oninit = function () {
@@ -90,7 +92,8 @@
                     break;
             }
             getResetBtn()
-                .style('transform', "translate(" + x + "px," + y + "px)")
+                .attr('x', x)
+                .attr('y', y)
                 .classed('visible', true);
         }
         function getRect() {
@@ -179,10 +182,14 @@
             };
         }
         function eventToPoint(e) {
-            return trimPoint({
-                x: e.layerX,
-                y: e.layerY
-            });
+            var p;
+            if (isIE || isFirefox) {
+                p = { x: e.layerX, y: e.layerY };
+            }
+            else {
+                p = { x: e.offsetX, y: e.offsetY };
+            }
+            return trimPoint(p);
         }
         function trimPoint(p) {
             var b = workingAreaBounds();
@@ -193,7 +200,7 @@
         }
         function workingAreaBounds() {
             var svgBox = svg.node().getBoundingClientRect();
-            var c3ChartBox = svg.select('.c3-event-rects').node().getBoundingClientRect();
+            var c3ChartBox = svg.select('.c3-zoom-rect').node().getBoundingClientRect();
             var x = c3ChartBox.left - svgBox.left;
             var y = c3ChartBox.top - svgBox.top;
             var w = c3ChartBox.width;

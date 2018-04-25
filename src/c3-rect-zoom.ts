@@ -33,6 +33,9 @@
 			minRectSize: (typeof optSettings.minRectSize == 'number' ? {width: optSettings.minRectSize, height: optSettings.minRectSize} : optSettings.minRectSize) || {width: 10, height: 10}
 		}
 
+		const isIE = window.navigator.userAgent.indexOf('Trident') != -1;
+		const isFirefox = window.navigator.userAgent.indexOf('Firefox') != -1;
+
 		function mount(chartProps: c3.ChartConfiguration) {
 			const oninit = chartProps.oninit
 			chartProps.oninit = function() {
@@ -103,7 +106,8 @@
 					break
 			}
 			getResetBtn()
-				.style('transform', `translate(${x}px,${y}px)`)
+				.attr('x', x)
+				.attr('y', y)
 				.classed('visible', true)
 		}
 
@@ -204,10 +208,13 @@
 		}
 
 		function eventToPoint(e) {
-			return trimPoint({
-				x: e.layerX,
-				y: e.layerY
-			})
+			let p
+			if (isIE || isFirefox) {
+				p = {x: e.layerX, y: e.layerY}
+			} else {
+				p = {x: e.offsetX, y: e.offsetY}
+			}
+			return trimPoint(p)
 		}
 
 		function trimPoint(p) {
@@ -221,7 +228,7 @@
 
 		function workingAreaBounds() {
 			const svgBox = svg.node().getBoundingClientRect()
-			const c3ChartBox = svg.select('.c3-event-rects').node().getBoundingClientRect()
+			const c3ChartBox = svg.select('.c3-zoom-rect').node().getBoundingClientRect()
 			const x = c3ChartBox.left - svgBox.left
 			const y = c3ChartBox.top - svgBox.top
 			const w = c3ChartBox.width
